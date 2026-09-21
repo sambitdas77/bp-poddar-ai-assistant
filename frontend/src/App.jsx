@@ -1,26 +1,34 @@
+import { useState } from "react";
+
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import ChatWindow from "./components/ChatWindow";
 import ChatInput from "./components/ChatInput";
 
 function App() {
-  return (
-    <div className="flex h-screen bg-gray-100">
+    const [messages, setMessages] = useState([
+        {
+            sender: "ai",
+            text: "Hello Sambit! 👋 Ask me anything about BP Poddar."
+        }
+    ]);
 
-      <Sidebar />
+    return (
+        <div className="flex h-screen bg-gray-100">
+            <Sidebar />
 
-      <div className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1">
+                <Header />
 
-        <Header />
+                <ChatWindow messages={messages} />
 
-        <ChatWindow />
-
-        <ChatInput />
-
-      </div>
-
-    </div>
-  );
+                <ChatInput
+                    messages={messages}
+                    setMessages={setMessages}
+                />
+            </div>
+        </div>
+    );
 }
 
 export default App;

@@ -8,11 +8,20 @@ from pydantic import BaseModel
 from google import genai
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
 app = FastAPI(title="BP Poddar AI Assistant API")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 embeddings = GoogleGenerativeAIEmbeddings(
