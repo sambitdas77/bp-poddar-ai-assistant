@@ -1,18 +1,22 @@
 
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from google import genai
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
-from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
-app = FastAPI(title="BP Poddar AI Assistant API")
+app = FastAPI(
+    title="BP Poddar AI Assistant API",
+    version="2.3.0"
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -22,7 +26,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+client = genai.Client(
+    api_key=os.getenv("GOOGLE_API_KEY")
+)
 
 embeddings = GoogleGenerativeAIEmbeddings(
     model="gemini-embedding-2",
@@ -36,24 +43,37 @@ db = Chroma(
     embedding_function=embeddings
 )
 
+
 class ChatRequest(BaseModel):
     question: str
 
+
 @app.get("/")
 def home():
-    return {"message": "BP Poddar AI Assistant API is live 🚀"}
+    return {
+        "message": "BP Poddar AI Assistant Backend Running 🚀"
+    }
+
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-
-    docs = db.similarity_search(request.question, k=5)
-
-    context = "\n\n".join(
-        [f"Page {d.metadata['page']+1}:\n{d.page_content}" for d in docs]
+    docs = db.similarity_search(
+        request.question,
+        k=5
     )
 
+    context = "\n\n".join([
+        f"Page {doc.metadata['page']+1}\n{doc.page_content}"
+        for doc in docs
+    ])
+
     prompt = f"""
-Answer only from the context below.
+You are BP Poddar AI Assistant.
+
+Answer ONLY using the provided context.
+
+If the answer is not present, reply:
+'The uploaded documents do not contain this information.'
 
 Context:
 {context}
@@ -69,5 +89,5 @@ Question:
 
     return {
         "answer": response.text,
-        "sources": [d.metadata["page"]+1 for d in docs]
+        "sources": [doc.metadata["page"] + 1 for doc in docs]
     }

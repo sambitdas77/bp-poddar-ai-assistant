@@ -1,19 +1,34 @@
+
+import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
 
-function ChatWindow({ messages }) {
+function ChatWindow({ messages, loading }) {
+  const bottomRef = useRef(null);
 
-    return (
-        <div className="flex-1 overflow-y-auto p-6">
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages, loading]);
 
-            {messages.map((msg, index) => (
-                <MessageBubble
-                    key={index}
-                    message={msg}
-                />
-            ))}
+  return (
+    <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+      {messages.map((msg, index) => (
+        <MessageBubble key={index} message={msg} />
+      ))}
 
-        </div>
-    );
+      {loading && (
+        <MessageBubble
+          message={{
+            sender: "ai",
+            text: "🤖 BP Poddar AI is thinking...",
+          }}
+        />
+      )}
+
+      <div ref={bottomRef}></div>
+    </div>
+  );
 }
 
 export default ChatWindow;

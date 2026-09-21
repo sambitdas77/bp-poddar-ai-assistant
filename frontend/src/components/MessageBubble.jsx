@@ -1,21 +1,27 @@
-function MessageBubble({ message }) {
 
+function MessageBubble({ message }) {
   const isAI = message.sender === "ai";
 
   return (
-    <div className={`flex ${isAI ? "justify-start" : "justify-end"} mb-4`}>
-
+    <div className={`flex mb-5 ${isAI ? "justify-start" : "justify-end"}`}>
       <div
         className={`
-          max-w-lg p-4 rounded-2xl shadow
-          ${isAI
-            ? "bg-white text-black"
-            : "bg-blue-600 text-white"}
+          max-w-[75%] px-5 py-3 rounded-2xl shadow-md
+          ${
+            isAI
+              ? "bg-white text-gray-800 rounded-bl-md"
+              : "bg-blue-600 text-white rounded-br-md"
+          }
         `}
       >
-        {message.text}
-      </div>
+        <p className="whitespace-pre-wrap">{message.text}</p>
 
+        {message.sources && message.sources.length > 0 && (
+          <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-blue-600">
+            📄 Sources: {message.sources.join(", ")}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
